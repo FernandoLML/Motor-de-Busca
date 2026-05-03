@@ -1,0 +1,138 @@
+{
+  "id": null,
+  "uid": "motor-busca-main",
+  "title": "Motor de Busca — Observabilidade",
+  "tags": ["motor-busca", "substring-search"],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "10s",
+  "time": { "from": "now-1h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Total de Buscas por Algoritmo",
+      "type": "stat",
+      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "sum by (algorithm) (motor_busca_search_requests_total_total)",
+          "legendFormat": "{{algorithm}}"
+        }
+      ],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" }
+    },
+    {
+      "id": 2,
+      "title": "Taxa de Buscas (req/s)",
+      "type": "stat",
+      "gridPos": { "x": 6, "y": 0, "w": 6, "h": 4 },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "sum(rate(motor_busca_search_requests_total_total[1m]))",
+          "legendFormat": "req/s"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Taxa de Encontrado vs Não Encontrado",
+      "type": "piechart",
+      "gridPos": { "x": 12, "y": 0, "w": 6, "h": 8 },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "sum by (found) (motor_busca_search_requests_total_total)",
+          "legendFormat": "found={{found}}"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Buscas por Algoritmo (últimos 30min)",
+      "type": "barchart",
+      "gridPos": { "x": 18, "y": 0, "w": 6, "h": 8 },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "sum by (algorithm) (increase(motor_busca_search_requests_total_total[30m]))",
+          "legendFormat": "{{algorithm}}"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Tempo Médio de Busca por Algoritmo (ms)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(motor_busca_search_duration_ms_sum[2m]) / rate(motor_busca_search_duration_ms_count[2m])",
+          "legendFormat": "{{algorithm}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": { "lineWidth": 2 }
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "Comparação de Algoritmos — Tempo P95 (ms)",
+      "type": "bargauge",
+      "gridPos": { "x": 0, "y": 12, "w": 24, "h": 6 },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "histogram_quantile(0.95, sum by (algorithm, le) (rate(motor_busca_search_duration_ms_bucket[5m])))",
+          "legendFormat": "{{algorithm}} — P95"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "ms" }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "reduceOptions": { "calcs": ["lastNotNull"] }
+      }
+    },
+    {
+      "id": 7,
+      "title": "Tamanho Médio dos Documentos (chars)",
+      "type": "gauge",
+      "gridPos": { "x": 0, "y": 18, "w": 8, "h": 6 },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(motor_busca_document_size_chars_sum[5m]) / rate(motor_busca_document_size_chars_count[5m])",
+          "legendFormat": "avg chars"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0, "max": 5000000 } }
+    },
+    {
+      "id": 8,
+      "title": "Requisições por Algoritmo (rate)",
+      "type": "timeseries",
+      "gridPos": { "x": 8, "y": 18, "w": 16, "h": 6 },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "sum by (algorithm) (rate(motor_busca_search_requests_total_total[1m]))",
+          "legendFormat": "{{algorithm}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": { "lineWidth": 2 }
+        }
+      }
+    }
+  ]
+}
