@@ -31,7 +31,7 @@ metrics_generator:
       source: tempo
   storage:
     path: /var/tempo/generator/wal
-  processors: [service-graphs, span-metrics]
+  
 
 overrides:
   metrics_generator_processors: [service-graphs, span-metrics]
