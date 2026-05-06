@@ -7,7 +7,4 @@ scrape_configs:
     static_configs:
       - targets: ['otel-collector:8889']
 
-  - job_name: 'motor-busca-backend'
-    static_configs:
-      - targets: ['backend:8000']
-    metrics_path: /metrics
+  
